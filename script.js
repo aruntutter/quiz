@@ -131,8 +131,10 @@ const arr = [
   },
 ];
 
-let count = 0;
-let score = 0;
+let count = sessionStorage.getItem("clickCount") || 0;
+count = parseInt(count);
+let score = sessionStorage.getItem("currentScore") || 0;
+score = parseInt(score);
 let answer = document.createElement("p");
 let finalScore = document.createElement("p");
 let isAnswered = false;
@@ -141,6 +143,7 @@ let isCorrect = false;
 nextBtn.addEventListener("click", () => {
   if (isAnswered) {
     count++;
+    sessionStorage.setItem("clickCount", count);
 
     // CLEAR ELEMENTS
     questionDiv.innerHTML = "";
@@ -148,6 +151,9 @@ nextBtn.addEventListener("click", () => {
     answerDiv.innerHTML = "";
     isAnswered = false;
     isCorrect = false;
+    sessionStorage.removeItem("selectedAnswer");
+    sessionStorage.removeItem("selectedAnswerDetails");
+    sessionStorage.removeItem("isAnswered");
 
     if (count !== arr.length) {
       domDisplay();
@@ -160,6 +166,32 @@ nextBtn.addEventListener("click", () => {
 
       finalScore.innerText = `Your Total Score is: ${score} out of ${arr.length}`;
       container.appendChild(finalScore);
+
+      const resetButton = document.createElement("button");
+      resetButton.textContent = "Reset";
+      resetButton.className = "reset-btn";
+
+      container.appendChild(resetButton);
+
+      resetButton.addEventListener("click", () => {
+        count = 0;
+        score = 0;
+        isAnswered = false;
+        isCorrect = false;
+
+        // Reset sessionStorage
+        sessionStorage.setItem("clickCount", count);
+        sessionStorage.setItem("currentScore", score);
+        sessionStorage.removeItem("selectedAnswer");
+        sessionStorage.removeItem("selectedAnswerDetails");
+        sessionStorage.removeItem("isAnswered");
+
+        // Reset UI
+        container.innerHTML = "";
+
+        // Rebind elements
+        location.reload();
+      });
     }
   } else {
     alert("Please select the option!");
@@ -176,54 +208,82 @@ const domDisplay = () => {
 
   // QUESTION
   question.innerText = arr[count].question;
+  questionDiv.appendChild(question);
 
   // OPTIONS
-  let newOptions = [];
-  arr[count].options.forEach((el) => {
-    newOptions.push(el);
-  });
+  let newOptions = [...arr[count].options];
 
-  newOptions.forEach((optionText) => {
+  newOptions.forEach((optionText, i) => {
     let li = document.createElement("li");
     li.className = "option";
     li.textContent = optionText;
+    li.setAttribute("data-index", i + 1);
     optionsUl.appendChild(li);
 
     // USER OPTION CLICKED
     li.addEventListener("click", () => {
-      answerSelected(li);
+      answerStore(li);
     });
   });
-  questionDiv.appendChild(question);
+
+  // Store Selected Answer
+  const answerStore = (li) => {
+    const detailsOfSelectedItem = {
+      optionNumber: li.getAttribute("data-index"),
+      correctAnswerIs: arr[count].answer,
+      userSelectedAnswerIS: li.textContent,
+    };
+
+    sessionStorage.setItem(
+      "selectedAnswerDetails",
+      JSON.stringify(detailsOfSelectedItem)
+    );
+    answerSelected(li, detailsOfSelectedItem.correctAnswerIs);
+
+    sessionStorage.setItem("isAnswered", "true");
+  };
 
   // ANSWER
-  const answerSelected = (li) => {
-    let correctAnswer = arr[count].answer;
-
-    if (li.textContent == correctAnswer) {
-      li.style.backgroundColor = "#18881860";
+  const answerSelected = (element, correctAns) => {
+    if (element.textContent == correctAns) {
+      element.style.backgroundColor = "#18881860";
       answer.innerText = `Correct Answer!`;
       answerDiv.appendChild(answer);
-      isCorrect = true;
-      if (isCorrect) {
+
+      // Only increase score if question wasn't already answered
+      if (sessionStorage.getItem("isAnswered") !== "true") {
         score++;
-        // NO OF SCORE
-        scoreDiv.innerText = `${score}/${arr.length}`;
+        sessionStorage.setItem("currentScore", score);
       }
+      scoreDiv.innerText = `${score}/${arr.length}`;
+      isCorrect = true;
     } else {
-      li.style.backgroundColor = "#d129296f";
-      answer.innerText = `Wrong, Correct Ans is: ${correctAnswer}`;
-      answerDiv.appendChild(answer);
+      element.style.backgroundColor = "#d129296f";
+      answer.innerText = `Wrong, Correct Ans is: ${correctAns}`;
     }
 
-    // OPTIONS DISABLED
-    let optionsList = Array.from(optionsUl.children);
+    answerDiv.innerHTML = "";
+    answerDiv.appendChild(answer);
 
-    optionsList.forEach((optEl) => {
+    // OPTIONS DISABLED
+    Array.from(optionsUl.children).forEach((optEl) => {
       optEl.classList.add("disabled");
     });
     isAnswered = true;
   };
+
+  // 🔄 Restore previous selection (on refresh)
+  const storedAnswer = JSON.parse(
+    sessionStorage.getItem("selectedAnswerDetails")
+  );
+  if (storedAnswer && storedAnswer.correctAnswerIs === arr[count].answer) {
+    const selectedEl = document.querySelector(
+      `[data-index="${storedAnswer.optionNumber}"]`
+    );
+    if (selectedEl) {
+      answerSelected(selectedEl, storedAnswer.correctAnswerIs);
+    }
+  }
 };
 
 domDisplay();
