@@ -5175,3 +5175,24 @@ const domDisplay = () => {
 };
 
 domDisplay();
+
+// Animation
+
+const petalsDiv = document.getElementById("petals");
+const maxPetals = window.innerWidth < 768 ? 6 : 10;
+
+function createPetal() {
+  if (petalsDiv.children.length >= maxPetals) return;
+
+  const petal = document.createElement("div");
+  petal.className = "petal";
+  petal.style.left = Math.random() * window.innerWidth + "px";
+  petal.style.animation = `fall ${Math.random() * 4 + 5}s linear infinite`;
+
+  petalsDiv.appendChild(petal);
+
+  setTimeout(() => petal.remove(), 9000);
+}
+
+setInterval(createPetal, 1000);
+createPetal();
