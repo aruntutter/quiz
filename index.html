@@ -4,32 +4,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Japanese Vocab - Quiz Application</title>
-  <link rel="shortcut icon" href="./images/favicon-32x32.png" type="image/x-icon">
+  <title>Japanese Quiz Application</title>
+  <link rel="shortcut icon" href="./images/favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-  <div class="container">
-    <!-- Question -Score -->
-    <div class="question-score">
-      <div class="question">
+
+  <!-- Title -->
+  <!-- にほんごクイズ (Nihongo Kuizu) -->
+  <h1 class="main-title"><span class="jp">🇯🇵</span> にほんごクイズ 🎌</h1>
+
+  <!-- Quiz Container -->
+  <div class="wrapper">
+    <!-- Input -->
+    <div class="chapter-input">
+      <div class="chapter-no-input">
+        <input type="number" placeholder="Enter N5/N4 Chapter No." id="n5-chapter">
       </div>
-      <div class="score">
+      <div class="apply-chapter">
+        <input type="submit" value="Apply" id="apply-chapter">
       </div>
     </div>
-    <!-- Options -->
-    <ul class="options">
-    </ul>
-    <!-- Answer -->
-    <div class="answer">
+
+    <!-- Question No. - Lesson No. - Score -->
+    <div class="question-details">
+      <div class="question-no">
+        <span>Question</span>
+        <span class="no-of-questions"></span>
+      </div>
+      <div class="chapter-no">
+        <span>Chapter</span>
+        <span class="level-chapter-no"></span>
+      </div>
+      <div class="scroe-no">
+        <span>Score</span>
+        <span class="score"></span>
+      </div>
     </div>
-    <!-- Nxt Button -->
-    <div class="next">
-      <button class="no-of-questions">0/24</button>
-      <button class="nxt">Next</button>
+
+    <!-- Quiz Display -->
+    <div class="container">
+      <!-- Question -Score -->
+      <div class="question-div">
+        <div class="question">
+        </div>
+      </div>
+      <!-- Options -->
+      <ul class="options">
+      </ul>
+      <!-- Answer -->
+      <div class="answer">
+      </div>
+      <!-- Nxt Button -->
+      <div class="reset-next">
+        <button class="reset-btn-01">Reset</button>
+        <button class="nxt">Next</button>
+      </div>
     </div>
   </div>
+
+  <!-- Footer Message -->
+  <div class="footer-message">Made with ❤️ for Japanese learners.</div>
 
   <!-- <script src="./script.js"></script> -->
   <script src="./script.js"></script>
